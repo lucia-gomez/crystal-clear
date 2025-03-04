@@ -5,8 +5,8 @@
 #define RIGHT_TRIG_PIN  9
 #define RIGHT_ECHO_PIN  10
 
-const unsigned int MAX_DIST = 8; // inches
-const unsigned int MIN_DIST = 2; // inches
+const unsigned int MAX_DIST = 9; // inches
+const unsigned int MIN_DIST = 3; // inches
 
 void setup() {
   pinMode(LEFT_TRIG_PIN, OUTPUT); 
@@ -66,7 +66,7 @@ void loop() {
     }
   }
 
-  delay(100); 
+  delay(10); 
 }
 
 float measurePulse(pin_size_t trigPin, pin_size_t echoPin) {
@@ -84,12 +84,29 @@ float measurePulse(pin_size_t trigPin, pin_size_t echoPin) {
   return calculatedDistance; 
 }
 
-float mapSpeed(float dist) {
-  if (dist < 0) {
-    return map(dist, MAX_DIST * -1, MIN_DIST * -1, -50, -1);
-  }
-  return map(dist, MIN_DIST, MAX_DIST, 1, 50);
+float mapSpeed(float distance) {
+  float minSpeed = 0.0;
+  float maxSpeed = 5.0;
+
+  // if (distance > MIN_DIST && distance <= MIN_DIST + 1) {
+  //   return minSpeed;
+  // }
+
+  float sign = (distance < 0) ? -1.0 : 1.0;
+  distance = abs(distance);
+  distance = constrain(distance, MIN_DIST, MAX_DIST);
+  float t = (distance - MIN_DIST) / (MAX_DIST - MIN_DIST);
+  t = t * t;
+
+  return sign * (minSpeed + t * (maxSpeed - minSpeed));
 }
+
+// float mapSpeed(float dist) {
+//   if (dist < 0) {
+//     return map(dist, MAX_DIST * -1, MIN_DIST * -1, -50, -1);
+//   }
+//   return map(dist, MIN_DIST, MAX_DIST, 1, 50);
+// }
 
 void sendTd(String msg) {
   Serial.print(msg);
